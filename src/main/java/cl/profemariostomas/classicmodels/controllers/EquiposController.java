@@ -2,29 +2,30 @@ package cl.profemariostomas.classicmodels.controllers;
 
 import cl.profemariostomas.classicmodels.ControllerResponse;
 import cl.profemariostomas.classicmodels.MySQLConnection;
-import cl.profemariostomas.classicmodels.models.DepartamentoModel;
+import cl.profemariostomas.classicmodels.models.EquipoModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class DepartamentosController {
+public class EquiposController {
 
-    public static ControllerResponse insert(DepartamentoModel departamento) {
-        String SQL_INSERT = "INSERT INTO departamentos (id_depto, nombre_depto, centro_costo) VALUES (?, ?, ?);";
+    public static ControllerResponse insert(EquipoModel equipo) {
+        String SQL_INSERT = "INSERT INTO equipos (equipo_id, descripcion, numero_serie, aula_asignada_id) VALUES (?, ?, ?, ?);";
 
         try (Connection conn = MySQLConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(SQL_INSERT)) {
 
-            pstmt.setInt(1, departamento.getIdDepto());
-            pstmt.setString(2, departamento.getNombreDepto());
-            pstmt.setString(3, departamento.getCentroCosto());
+            pstmt.setInt(1, equipo.getEquipoId());
+            pstmt.setString(2, equipo.getDescripcion());
+            pstmt.setString(3, equipo.getNumeroSerie());
+            pstmt.setInt(4, equipo.getAulaAsignadaId());
 
             int rowCount = pstmt.executeUpdate();
 
             if (rowCount > 0) {
-                return new ControllerResponse(true, "Departamento " + departamento.getNombreDepto() + " guardado!");
+                return new ControllerResponse(true, "Equipo " + equipo.getDescripcion() + " guardado!");
             }
             return new ControllerResponse(false, "No se insertó el registro");
         } catch (SQLException e) {
@@ -32,20 +33,21 @@ public class DepartamentosController {
         }
     }
 
-    public static ControllerResponse update(DepartamentoModel departamento) {
-        String SQL_UPDATE = "UPDATE departamentos SET nombre_depto = ?, centro_costo = ? WHERE id_depto = ?;";
+    public static ControllerResponse update(EquipoModel equipo) {
+        String SQL_UPDATE = "UPDATE equipos SET descripcion = ?, numero_serie = ?, aula_asignada_id = ? WHERE equipo_id = ?;";
 
         try (Connection conn = MySQLConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE)) {
 
-            pstmt.setString(1, departamento.getNombreDepto());
-            pstmt.setString(2, departamento.getCentroCosto());
-            pstmt.setInt(3, departamento.getIdDepto());
+            pstmt.setString(1, equipo.getDescripcion());
+            pstmt.setString(2, equipo.getNumeroSerie());
+            pstmt.setInt(3, equipo.getAulaAsignadaId());
+            pstmt.setInt(4, equipo.getEquipoId());
 
             int rowCount = pstmt.executeUpdate();
 
             if (rowCount > 0) {
-                return new ControllerResponse(true, "Departamento " + departamento.getIdDepto() + " actualizado!");
+                return new ControllerResponse(true, "Equipo " + equipo.getEquipoId() + " actualizado!");
             }
             return new ControllerResponse(false, "No se encontró el registro");
         } catch (SQLException e) {
@@ -53,9 +55,9 @@ public class DepartamentosController {
         }
     }
 
-    public static ArrayList<DepartamentoModel> select() {
-        String SQL_SELECT = "SELECT * FROM departamentos;";
-        ArrayList<DepartamentoModel> departamentos = new ArrayList<>();
+    public static ArrayList<EquipoModel> select() {
+        String SQL_SELECT = "SELECT * FROM equipos;";
+        ArrayList<EquipoModel> equipos = new ArrayList<>();
 
         try (Connection conn = MySQLConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT)) {
@@ -63,16 +65,17 @@ public class DepartamentosController {
             ResultSet records = pstmt.executeQuery();
 
             while (records.next()) {
-                departamentos.add(
-                    new DepartamentoModel(
-                        records.getInt("id_depto"),
-                        records.getString("nombre_depto"),
-                        records.getString("centro_costo")
+                equipos.add(
+                    new EquipoModel(
+                        records.getInt("equipo_id"),
+                        records.getString("descripcion"),
+                        records.getString("numero_serie"),
+                        records.getInt("aula_asignada_id")
                     )
                 );
             }
 
-            return departamentos;
+            return equipos;
         } catch (SQLException e) {
             System.out.println("Cant get data: " + e.getMessage());
             return null;
